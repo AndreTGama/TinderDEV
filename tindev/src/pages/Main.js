@@ -1,30 +1,75 @@
 import React, {useState, useEffect}from 'react';
 import {View,Text, SafeAreaView, Image,StyleSheet} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
-import axios from '../services/api';
+import api from '../services/api';
+
 import Logo from '../assets/logo.png';
 import dislike from '../assets/dislike.png';
 import like from '../assets/like.png';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 
-export default function Main(){
+export default function Main({navigation}){
+    const id = navigation.getParam('user')
+    const[user, setUsers] = useState([]);
+    
+    useEffect(() => {
+        async function loadUsers() {
+            const response = await api.get('/devs',{
+                headers:{
+                    user: id,
+                }
+            })
+            setUsers(response.data)
+        }
+
+        loadUsers();
+    }, [id]);
+
+    async function handlerLike(){
+        const [user, ...rest] = users;
+        await api.post(`/devs/${user._id}/likes`, null,{
+            headers: {user : id},
+        })
+        setUsers(rest);
+    }
+    async function handlerDislike(id){
+        const [user, ...rest] = users;
+        await api.post(`/devs/${user._id}/dislikes`, null, {
+            headers: {user: id},
+        })
+        setUsers(rest);
+    }
+    async function handleLogount(){
+        await AsyncStorage.clear();
+
+        navigation.navigate('Login');
+    }
+
     return(
         <SafeAreaView style={styles.container}>
-            <Image style={styles.logo} source={Logo}/>
+            <TouchableOpacity onPress={handleLogount}>
+                <Image style={styles.logo} source={Logo}/>
+            </TouchableOpacity>
             <View style={styles.cardsContainer}>
-                <View style={[styles.card, {zIndex: 3}] }>
-                    <Image style={styles.avatar} source={{uri:'https://avatars3.githubusercontent.com/u/43018148?v=4'}}/>
-                    <View style={styles.footer}>
-                        <Text style={styles.name}>Andre</Text>
-                        <Text style={styles.bio} numberOfLines={3}>Gamer</Text>
-                    </View>
-                </View>
+                {user.length === 0
+                    ?<Text style={styles.empty}>Acabou :( </Text>
+                    :(user.map((user, index) => (
+                        <View Key={user._id} style={[styles.card, {zIndex: users.length - index}] }>
+                            <Image style={styles.avatar} source={{uri: user.Avatar }}/>
+                            <View style={styles.footer}>
+                                <Text style={styles.name}>{user.name}</Text>
+                                <Text style={styles.bio} numberOfLines={3}>{user.bio}</Text>
+                            </View>
+                        </View>
+                    ))
+                )}
             </View>
             <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.buttom}>
+                <TouchableOpacity style={styles.buttom} onPress={handlerLike}>
                     <Image  source={like}/>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.buttom}>
+                <TouchableOpacity style={styles.buttom} onPress={handlerDislike}>
                     <Image style={styles.dislike} source={dislike}/>
                 </TouchableOpacity>
             </View>
@@ -100,5 +145,11 @@ const styles = StyleSheet.create({
             width:0,
             height:2,
         },
+    },
+    empty:{
+        alignSelf: 'center',
+        color: '#999',
+        fontSize:24,
+        fontWeight: 'bold' 
     },
 })
