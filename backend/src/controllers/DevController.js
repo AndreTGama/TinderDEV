@@ -2,7 +2,7 @@ const axios = require('axios');
 const Dev = require('../models/Dev');
 module.exports = {
     async index (req, res){
-        const {user} = req.header;
+        const {user} = req.headers;
 
         const loggedDev = await Dev.findById(user);
 
