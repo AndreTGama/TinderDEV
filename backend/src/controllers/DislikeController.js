@@ -1,9 +1,8 @@
 const Dev = require('../models/Dev');
 module.exports = {
    async store(req, res) {
-
+        const {user} = req.headers;
         const {devId} = req.params;
-        const {user} = req.header;
 
         const loggerDev = await Dev.findById(user);
         const targetDev = await Dev.findById(devId);
