@@ -12,8 +12,7 @@ const connectedUsers = {
 };
 
 io.on('connection', socket => {
-  const {user } = socket.handshake.query;
-  console.log(user, socket.id);
+  const {user} = socket.handshake.query;
   connectedUsers[user] = socket.id;
 });
 
@@ -21,7 +20,7 @@ mongoose.connect('mongodb+srv://TinderDev:TinderDev@cluster0-iwaft.mongodb.net/T
     useNewUrlParser:true
 });
 
-app.user((req, res, next) => {
+app.use((req, res, next) => {
   req.io = io;
   req.connectedUsers = connectedUsers;
   return next();
