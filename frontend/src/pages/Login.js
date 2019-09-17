@@ -10,13 +10,14 @@ export default function Login({ history }){
         e.preventDefault();
 
         const response = await api.post('/devs', {
-            username : username,
+            username,
+            // username : username, ->MEU
         });
         const {_id} = response.data;
 
         history.push(`/devs/${_id}`);
     }
-
+    
     return(
         <div className="login-container">
             <form onSubmit={handleSubmit}>
@@ -29,6 +30,5 @@ export default function Login({ history }){
                 <button type="submit">Enviar</button>
             </form>
         </div>
-       
     );
 }

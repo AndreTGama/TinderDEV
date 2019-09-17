@@ -12,8 +12,8 @@ export default function Main({match}){
     const [users, setUsers] = useState([]);
     const [matchDev, setMatchDev] = useState(null)
 
-    useEffect(()=> {
-        async function loadUsers(){
+    useEffect(() => {
+        async function loadUsers() {
             const response = await api.get('/devs', {
                 headers: {
                     user: match.params.id,
