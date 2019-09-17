@@ -4,17 +4,26 @@ module.exports = {
         const {user} = req.headers;
         const {devId} = req.params;
 
-        const loggerDev = await Dev.findById(user);
-        const targetDev = await Dev.findById(devId);
+        // const loggerDev = await Dev.findById(user);
+        // const targetDev = await Dev.findById(devId);
 
-        if(!targetDev){
-            return res.status(400).json({error: 'Dev não existe'});
-        }
+        // if(!targetDev){
+        //     return res.status(400).json({error: 'Dev não existe'});
+        // } ->MEU
 
-        loggerDev.dislikes.push(targetDev._id);
+        const loggedDev = await Dev.findById(user);
+        let targetDev = null
 
-        await loggerDev.save();
+        try {
+            targetDev = await Dev.findById(devId);
+          } catch (error) {
+            return res.status(400).json({ error: 'Dev not exists' });
+          }
 
-        return res.json(loggerDev);
+        loggedDev.dislikes.push(targetDev._id);
+
+        await loggedDev.save();
+
+        return res.json(loggedDev);
     }
 };

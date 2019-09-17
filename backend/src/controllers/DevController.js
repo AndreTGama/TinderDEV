@@ -1,5 +1,6 @@
 const axios = require('axios');
 const Dev = require('../models/Dev');
+
 module.exports = {
     async index (req, res){
         const {user} = req.headers;
@@ -10,7 +11,7 @@ module.exports = {
             $and:[
                 {_id: {$ne: user}},
                 {_id : {$nin: loggedDev.likes}},
-                {_id : {$nin: loggedDev.deslikes}}, 
+                {_id : {$nin: loggedDev.dislikes}}, 
             ],
         })
         return res.json(users)
@@ -20,10 +21,10 @@ module.exports = {
 
         const {username} = req.body;
 
-        const userExist = await Dev.findOne({user :username});
+        const userExists = await Dev.findOne({user :username});
 
-        if(userExist){
-            return res.json(userExist); 
+        if(userExists){
+            return res.json(userExists); 
         }
 
         const response = await axios.get(`https://api.github.com/users/${username}`);
